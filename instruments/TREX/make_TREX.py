@@ -2,14 +2,15 @@
 # Automatically generated file. 
 # Format:    Python script code
 # McStas <http://www.mcstas.org>
-# Instrument: TREX_McStas.instr (TRex)
-# Date:       Mon May  4 13:27:20 2026
-# File:       TREX_McStas_generated.py
+# Instrument: TREX.instr (TRex)
+# Date:       Mon May 18 10:38:19 2026
+# File:       TREX_generated.py
 
 import mcstasscript as ms
 
 # Python McStas instrument description
-def make(name="TRex_generated", input_path=None):
+def make(name="TREX_generated", input_path=None):
+    
     if input_path is not None:
         instr = ms.McStas_instr(name, author = "McCode Py-Generator", origin = "ESS DMSC", input_path=input_path)
     else:
@@ -30,15 +31,13 @@ def make(name="TRex_generated", input_path=None):
 
     # Instrument parameters:
 
-    L0 = instr.add_parameter('double', 'L0', value=2.4, comment='Parameter type (double) added by McCode py-generator')
+    L0 = instr.add_parameter('double', 'L0', value=4.78, comment='Parameter type (double) added by McCode py-generator')
     d_Li = instr.add_parameter('double', 'd_Li', value=0.845, comment='Parameter type (double) added by McCode py-generator')
-    RRM = instr.add_parameter('int', 'RRM', value=18, comment='Parameter type (int) added by McCode py-generator')
-    mod_type = instr.add_parameter('int', 'mod_type', value=1, comment='Parameter type (int) added by McCode py-generator')
+    RRM = instr.add_parameter('int', 'RRM', value=8, comment='Parameter type (int) added by McCode py-generator')
+    mod_type = instr.add_parameter('int', 'mod_type', value=0, comment='Parameter type (int) added by McCode py-generator')
     bender = instr.add_parameter('int', 'bender', value=0, comment='Parameter type (int) added by McCode py-generator')
     sample_rot = instr.add_parameter('double', 'sample_rot', value=0, comment='Parameter type (double) added by McCode py-generator')
-    phase_M = instr.add_parameter('double', 'phase_M', value=0, comment='Parameter type (double) added by McCode py-generator')
-    phase_P = instr.add_parameter('double', 'phase_P', value=0, comment='Parameter type (double) added by McCode py-generator')
-    block_pulses = instr.add_parameter('string', 'block_pulses', value='"NULL"', comment='Parameter type (string) added by McCode py-generator')
+    r = instr.add_parameter('string', 'r', value='"HR"', comment='Parameter type (string) added by McCode py-generator')
     b_rot = instr.add_parameter('double', 'b_rot', value=-0.5, comment='Parameter type (double) added by McCode py-generator')
     coll = instr.add_parameter('double', 'coll', value=0, comment='Parameter type (double) added by McCode py-generator')
 
@@ -47,10 +46,7 @@ def make(name="TRex_generated", input_path=None):
     instr.append_declare(r'''
 double frac; // used in the Source component, Defines the statistical fraction of events emitted from the cold part of the moderator, the value is determined later in the file depending in the moderator type that was chosen
 
-double lamb_1, lamb_2, Li;
-
-double RRM_uneven;
-double half_RRM;
+double lamb_1, lamb_2, E_2, E_1, Li;
 
 double tof_BW1, tof_BW2, tof_M1, tof_M2, tof_P1, tof_P2;
 
@@ -78,11 +74,14 @@ double L_P2 = 108.05;
 double L_M1 = 161.995;
 double L_M2 = 162.005;
 
-double L_S = 163.8;           // length to sample
-double L_D = 166.8;	      // length to detector
-double L_SD = 3;              // length from sample to monitor --> Must be (L_D - L_S)
+double L_S = 163.8;       
+double L_D = 166.8;	      
+double L_SD = 3;              
+
 
 // Chopper parameters
+    double P_slit, M_slit, n_slit_P, n_slit_M;
+    
 
     // BW1 Chopper
     double f_BW1;
@@ -104,68 +103,37 @@ double L_SD = 3;              // length from sample to monitor --> Must be (L_D 
     
     // P1 Chopper
     double f_P1;
-    double radius_P1;
-    char theta_pos_P1[256] = "0 -55 -180 -235";
-    char theta_width_P1[256] = "20 35 20 35";
-    double delta_y_P1;
     double delay_P1; //time delay
-    double nslits_P1;
     double phase_P1;// angular delay
     
     // P2 Chopper
     double f_P2;
-    double radius_P2;
-    char theta_pos_P2[256] = "0 -55 -180 -235";
-    char theta_width_P2[256] = "20 35 20 35";
-    double delta_y_P2;
     double delay_P2; //time delay
-    double nslits_P2;
     double phase_P2;// angular delay
-    
-    // FAN Chopper
-    double f_FAN;
-    double radius_FAN;
-    char theta_pos_FAN[256] = "180";
-    char theta_width_FAN[256] = "348";
-    double delta_y_FAN;
-    double nslits_FAN;
-
-	double f_FAN1, f_FAN2, f_FAN3, f_FAN4, f_FAN5, f_FAN6, f_FAN7, f_FAN8, f_FAN9, f_FAN10;
-	double delay_FAN1, delay_FAN2, delay_FAN3, delay_FAN4, delay_FAN5, delay_FAN6, delay_FAN7, delay_FAN8, delay_FAN9, delay_FAN10;
-	double phase_FAN1, phase_FAN2, phase_FAN3, phase_FAN4, phase_FAN5, phase_FAN6, phase_FAN7, phase_FAN8, phase_FAN9, phase_FAN10;
 
     
     // M1 Chopper
     double f_M1;
-    double radius_M1;
-    char theta_pos_M1[256] = "0 175";
-    char theta_width_M1[256] = "2.5 4.4";
-    double delta_y_M1;
     double delay_M1; //time delay
-    double nslits_M1;
     double phase_M1;// angular delay
     
     // M2 Chopper
     double f_M2;
-    double radius_M2;
-    char theta_pos_M2[256] = "0 175";
-    char theta_width_M2[256] = "2.5 4.4";
-    double delta_y_M2;
     double delay_M2; //time delay
-    double nslits_M2;
     double phase_M2;// angular delay
+
 
 
 // tof for focusing at detector
 double tof_D_1;
 double tof_D_2;
 // detector options
-char   banana_options[1024], spherical_options[1024], square_options[1024], energy_options[1024];
+char   banana_options[1024], spherical_options[1024], spherical_options2[1024], square_options[1024], square_options2[1024], energy_options[1024];
 
 // monitor definitions
 int lbin;
 int ebin;
-char setSMl[256], setSMt[256],setSMt_M[256],setSMt_P[256], setSMlhdiv[256], setSMlvdiv[256], setBW1[256], setBW2[256], setPL[256], setP[256], setFAN[256], setML[256], setM[256], setSL[256], setS[256];
+char setSMl[256], setSMt[256],setSMt_M[256],setSMt_P[256], setSMlhdiv[256], setSMlvdiv[256], setBW1[256], setBW2[256], setPL[256], setP[256], setML[256], setM[256], setSL[256], setS[256], setD[256], setDL[256];
     ''')
 
 
@@ -184,9 +152,31 @@ switch (mod_type)
 	f_BW2 = f_BW1;
 	f_P1 = RRM*f*0.75;
 	f_P2 = -f_P1;
-	f_FAN = f;
 	f_M1 = RRM*f;
 	f_M2 = -f_M1;
+
+
+// Resolution Setings
+if (strcmp(r,"HR") == 0){
+	P_slit = 20;
+	M_slit = 2.5;
+} else if (strcmp(r,"HF") == 0){
+	P_slit = 35;
+	M_slit = 4.4;
+} else {
+	printf("\n Need valid resolution option, 'HR' or 'HF'\n");
+}
+
+
+// RRM Value check
+if (RRM < 4 || RRM > 24 || RRM % 2 != 0) {
+    printf("\n-------------------------------\n");
+    printf("\nERROR: RRM = %i is not valid!\n", RRM);
+    printf("RRM must be an even number between 4 and 24 in steps of 2\n");
+    printf("\n-------------------------------\n");
+    exit(1);
+}
+
 
 
 // characteristic wavelength 
@@ -198,12 +188,20 @@ switch (mod_type)
 // Source parameters
 	vi = 2*PI*K2V/Li;
 	//Ei = VS2E*vi*vi;
-	lamb_1 = L0-d_Li*1.1;
+
+if (L0>0.90) {
+	lamb_1 = L0-d_Li;
+} else {
+	lamb_1 = 0.01;
+}
+
 	printf("lamb_1: %g \n", lamb_1);
-	lamb_2 = L0+d_Li*1.1;
+	lamb_2 = L0+d_Li;
 	printf("lamb_2: %g \n", lamb_2);
 	v1 = 2*PI*K2V/lamb_1;   // slowest neutron
 	v2 = 2*PI*K2V/lamb_2;   // fastest neutron
+	E_1 = 81.81 / (lamb_1*lamb_1);
+	E_2 = 81.81/(lamb_2 * lamb_2);
 
 // time of flight and chopper phases
 	tof_BW1 = T_offset + L_BW1/v0;
@@ -215,53 +213,6 @@ switch (mod_type)
 	tof_P1 = T_offset + L_P1/v0;
 	tof_P2 = T_offset + L_P2/v0;
 
-// read in which pulses to block
-	int max_pulses = 10;
-	int blocked_pulses[max_pulses];	// Initialize all elements to 0
-	for (int i = 0; i < max_pulses; i++) {
-        blocked_pulses[i] = 0; 
-    }
-    int npulses = 0;
-
-    // Tokenize the input string
-    char *token = strtok(block_pulses, "-");
-    while (token != NULL && npulses < max_pulses) {
-        blocked_pulses[npulses++] = atoi(token);
-        token = strtok(NULL, "-");
-    }
-
-    // Output the array
-    printf("Array:\n");
-    for (int i = 0; i < max_pulses; i++) {
-        printf("%d\n", blocked_pulses[i]);
-    }
-
-
-
- // Printing the blocked_pulses array
-    printf("Pulses to block:\n");
-    for (int i = 0; i < npulses; i++) {
-        printf("%d\n", blocked_pulses[i]); // Print as integers
-    }
-
-
-// calculate the tof for each FAN Chopper
-	half_RRM = RRM / 2;
-	RRM_uneven = half_RRM * 2 + 1;
-
-double Ls_FAN[npulses];
-double lambs_FAN[npulses];
-double tofs_FAN[max_pulses];
-for (int i = 0; i < max_pulses; i++) {
-        tofs_FAN[i] = 0; 
-    }
-
-for (int i = 0; i < npulses; i++) {
-    Ls_FAN[i] =  151.51801 + i * 0.070/9;
-    lambs_FAN[i] =  L0 - (half_RRM - blocked_pulses[i] + 1) * stepwl;
-    tofs_FAN[i] =  T_offset + Ls_FAN[i]/( 2*PI*K2V/lambs_FAN[i]);
-    printf("Abstand FAN: %f\n", Ls_FAN[i]);
-}
 
 printf("\ntof to M1: %g, M2: %g, P1: %g, P2: %g \n", tof_M1, tof_M2, tof_P1, tof_P2);  
 
@@ -279,147 +230,41 @@ printf("\ntof to M1: %g, M2: %g, P1: %g, P2: %g \n", tof_M1, tof_M2, tof_P1, tof
     delta_y_BW2 = delta_y_BW1;
     delay_BW2 = tof_BW2; //time delay
     nslits_BW2 = 1;
-    
-    // P1 Chopper
-    radius_P1 = 0.35;
-    delta_y_P1 = 0.305;
-    delay_P1 = tof_P1; //time delay
-    nslits_P1 = 4;
-    phase_P1 = phase_P;// angular delay
-    
-    // P2 Chopper
-    radius_P2 = 0.35;
-    delta_y_P2 = delta_y_P1;
-    delay_P2 = tof_P2; //time delay
-    nslits_P2 = 4;
-    phase_P2 = phase_P;// angular delay
-    
-    // FAN Chopper
-    radius_FAN = 0.35;
-    delta_y_FAN = 0.3125;
-    nslits_FAN = 1;
-
-// only #npulses of FAN choppers need to spin set all other frequencies to 0
-// FAN chopperblades block the beam by default if they are not rotating --> need to add phase to all fan choppers that dont spin
-    int freq_FAN[max_pulses];
-    int phases_FAN[max_pulses];
-
-    // Initialize the array with some sample values
-    for (int i = 0; i < max_pulses; i++) {
-        freq_FAN[i] = 0; 
-	phases_FAN[i] = 180;
-    }
-
-    // Set values based on the threshold
-    for (int i = 0; i < max_pulses; i++) {
-        if (i < npulses) {
-            freq_FAN[i] = 14;
-	    phases_FAN[i] = 0;
-        } 
-    }
-
-    // Print the updated values
-    printf("Updated freq_FAN and phases values:\n");
-    for (int i = 0; i < max_pulses; i++) {
-        printf("freq_FAN%d = %d\n", i + 1, freq_FAN[i]);
-	printf("phase%d = %d\n", i + 1, phases_FAN[i]);
-    }
-
-	delay_FAN1 = tofs_FAN[0];
-	delay_FAN2 = tofs_FAN[1];
-	delay_FAN3 = tofs_FAN[2];
-	delay_FAN4 = tofs_FAN[3];
-	delay_FAN5 = tofs_FAN[4];
-	delay_FAN6 = tofs_FAN[5];
-	delay_FAN7 = tofs_FAN[6];
-	delay_FAN8 = tofs_FAN[7];
-	delay_FAN9 = tofs_FAN[8];
-	delay_FAN10 =tofs_FAN[9];
-	            
-    printf("delays:\n");
-    for (int i = 0; i < max_pulses; i++) {
-        printf("%f\n", tofs_FAN[i]); // Print as integers
-    }
-          
-        phase_FAN1  = phases_FAN[0];
-	phase_FAN2  = phases_FAN[1];
-	phase_FAN3  = phases_FAN[2];
-	phase_FAN4  = phases_FAN[3];
-	phase_FAN5  = phases_FAN[4];
-	phase_FAN6  = phases_FAN[5];
-	phase_FAN7  = phases_FAN[6];
-	phase_FAN8  = phases_FAN[7];
-	phase_FAN9  = phases_FAN[8];
-	phase_FAN10 = phases_FAN[9];
-	
-    //printf("phases:\n %f", phase_FAN);
-
-	f_FAN1  = freq_FAN[0];
-	f_FAN2  = freq_FAN[1];
-	f_FAN3  = freq_FAN[2];
-	f_FAN4  = freq_FAN[3];
-	f_FAN5  = freq_FAN[4];
-	f_FAN6  = freq_FAN[5];
-	f_FAN7  = freq_FAN[6];
-	f_FAN8  = freq_FAN[7];
-	f_FAN9  = freq_FAN[8];
-	f_FAN10  = freq_FAN[9];
-
-    printf("frequencies:\n");
-    for (int i = 0; i < max_pulses; i++) {
-        printf("%d\n", freq_FAN[i]); // Print as integers
-    }
-
-
-printf("phases:\n %f", delay_FAN5);
-printf("phases:\n %f", f_FAN5);
-
-    // M1 Chopper
-    radius_M1 = 0.35;
-    delta_y_M1 = 0.325;
-    delay_M1 = tof_M1; //time delay
-    nslits_M1 = 2;
-    phase_M1 = phase_M;// angular delay
-
-    // M2 Chopper
-    radius_M2 = 0.35;
-    delta_y_M2 = -delta_y_M1;
-    delay_M2 = tof_M1; //time delay
-    nslits_M2 = 2;
-    phase_M2 = phase_M;// angular delay
 
      
 // Detector parameters
 tof_D_1 = T_offset + L_D/(K2V*2*PI/lamb_1);
 tof_D_2 = T_offset + tof_D_1 + 0.072 + 0.00289;
 lbin = round((lamb_2-lamb_1)/0.002);    
+sprintf(spherical_options, "sphere, theta limits = [5 135] bins=288, phi limits = [-5 5] bins=66, time limits=[%g %g]bins=[%li]", T_offset + L_D/v1, T_offset + L_D/v2, lbin*20);
+sprintf(spherical_options2, "square, time limits=[%g %g]bins=[%li]", 0.03, 2, lbin*20);
+sprintf(banana_options, "banana, theta limits = [5 135] bins=288, phi = [-5 5] bins = 66, lambda limits=[%g %g], bins=%i", lamb_1-0.2, lamb_2+0.2, lbin*2);
+sprintf(square_options, "banana, theta limits = [5 135] bins=288, phi = [-5 5] bins = 66, energy limits=[%g %g], bins=350", E_2*0.8, E_1*1.1);
+sprintf(square_options2, "banana, theta limits = [5 135] bins=288, phi limits = [-5 5] bins = 66, list all neutrons, x y z t vx vy vz, time limits=[0 1]");
 
-//sprintf(spherical_options, "sphere, theta limits = [10 135] bins=288, phi limits = [-25 15] bins=66, time limits=[%g %g]bins=[%li]", T_offset + L_D/v1, T_offset + L_D/v2, lbin*50);
-//sprintf(banana_options, "banana, theta limits = [10 144] bins=288, phi limits = [-25 15] bins=66, time limits=[%g %g]bins=250", T_offset + L_D/v1, T_offset + L_D/v2);
-//sprintf(banana_options, "xwidth = 0.1, yheight = 0.1, time limits=[%g %g]bins=[%li]", T_offset + L_D/v1, T_offset + L_D/v2, lbin*50); // 2*T_offset+L_D/v1, L_D/v2, lbin*10); // Removed T_offset +
-sprintf(square_options, "time limits=[%g %g]bins=[%li]", T_offset + L_D/v1, T_offset + L_D/v2, lbin*10);
 // Monitors
 lbin = round((lamb_2-lamb_1)/0.002);    // number of bins for TOF monitors
 printf("\n\n \t nbin: %i \n\n", lbin);
-sprintf(setBW1, "time limits [%g %g] bins = [%i]", T_offset + L_BW1/v1, T_offset + L_BW1/v2, lbin*5);
-sprintf(setBW2, "time limits [%g %g] bins = [%i]", T_offset + L_BW2/v1, T_offset + L_BW2/v2, lbin*5); //Changed T_offset + to what's written here
+sprintf(setBW1, "time limits [%g %g] bins = [%i]", T_offset + L_BW1/v1, T_offset + L_BW1/v2, lbin);
+sprintf(setBW2, "time limits [%g %g] bins = [%i]", T_offset + L_BW2/v1, T_offset + L_BW2/v2, lbin); //Changed T_offset + to what's written here
 sprintf(setP, "time limits [%g %g] bins = [%i]",   T_offset + L_P2/v1,  T_offset + L_P2/v2,  lbin*5);
-sprintf(setPL, "lambda limits=[%g %g], bins=%i", lamb_1, lamb_2, lbin*5);
+sprintf(setPL, "lambda limits=[%g %g], bins=%i", lamb_1-0.2, lamb_2+0.2, lbin);
 
-sprintf(setFAN, "time limits [%g %g] bins = [%i]", T_offset + Ls_FAN[0]/v1, T_offset + Ls_FAN[0]/v2, lbin*10);
 
-sprintf(setM, "time limits [%g %g] bins = [%i]",   T_offset + L_M2/v1,  T_offset + L_M2/v2,  lbin*10);
-sprintf(setML, "lambda limits=[%g %g], bins=%i", lamb_1, lamb_2, lbin*5);
-sprintf(setS, "time limits [%g %g] bins = [%i]",   T_offset + L_S/v1,   T_offset + L_S/v2,   lbin*10); //Added a 2* to T_offset +
-sprintf(setSL, "lambda limits=[%g %g], bins=%i", lamb_1, lamb_2, lbin*5);
-//tof_M1_min = T_offset+L_M1/vi-M_theta/360.0/f_M1;
-//tof_M2_max = T_offset+L_M2/vi-M_theta/360.0/f_M2;
+sprintf(setM, "time limits [%g %g] bins = [%i]",   T_offset + L_M2/v1,  T_offset + L_M2/v2,  lbin*20);
+sprintf(setML, "lambda limits=[%g %g], bins=%i", lamb_1-0.2, lamb_2+0.2, lbin);
+sprintf(setS, "time limits [%g %g] bins = [%i]",   T_offset + L_S/v1,   T_offset + L_S/v2,   lbin*50); 
+sprintf(setD, "time limits [%g %g] bins = [%i]",   T_offset + L_D/v1,   T_offset + L_D/v2,   lbin*20); 
+sprintf(setSL, "lambda limits=[%g %g], bins=%i", lamb_1-0.2, lamb_2+0.2, lbin);//was lbin, looked good. Gonna try to halve it!
+sprintf(setDL, "lambda limits=[%g %g], bins=%i", lamb_1-0.2, lamb_2+0.2, lbin);//was lbin, looked good. Gonna try to halve it!
+
 
 tof_M1_min = T_offset+L_M1/v1;
 tof_M2_max = T_offset+L_M2/v2;
 
 tof_P1_min = T_offset+L_P1/v1;
 tof_P2_max = T_offset+L_P2/v2;
+
 sprintf(setSMt_M, "time limits=[%g %g], bins=%i", tof_M1_min, tof_M2_max, 50);
 sprintf(setSMt_P, "time limits=[%g %g], bins=%i", tof_P1_min, tof_P2_max, 100);
 sprintf(setSMlhdiv, "hdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], bins=%i", lamb_1, lamb_2, lbin);
@@ -521,6 +366,35 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     source_monitor_div.username1 = '"NULL"'
     source_monitor_div.username2 = '"NULL"'
     source_monitor_div.username3 = '"NULL"'
+    
+    # Comp instance source_monitor_lam, placement and parameters
+    source_monitor_lam = instr.add_component('source_monitor_lam','Monitor_nD', AT=['-0.002', '0', '1.8955'])
+    
+    source_monitor_lam.user1 = '""'
+    source_monitor_lam.user2 = '""'
+    source_monitor_lam.user3 = '""'
+    source_monitor_lam.xwidth = '0.09'
+    source_monitor_lam.yheight = '0.03'
+    source_monitor_lam.zdepth = '0'
+    source_monitor_lam.xmin = '0'
+    source_monitor_lam.xmax = '0'
+    source_monitor_lam.ymin = '0'
+    source_monitor_lam.ymax = '0'
+    source_monitor_lam.zmin = '0'
+    source_monitor_lam.zmax = '0'
+    source_monitor_lam.bins = '0'
+    source_monitor_lam.min = '-1e40'
+    source_monitor_lam.max = '1e40'
+    source_monitor_lam.restore_neutron = '1'
+    source_monitor_lam.radius = '0'
+    source_monitor_lam.options = '"lambda limits [0.05:3.0] bins = 130"'
+    source_monitor_lam.filename = '"source_monitor_lam.dat"'
+    source_monitor_lam.geometry = '"NULL"'
+    source_monitor_lam.nowritefile = '0'
+    source_monitor_lam.nexus_bins = '0'
+    source_monitor_lam.username1 = '"NULL"'
+    source_monitor_lam.username2 = '"NULL"'
+    source_monitor_lam.username3 = '"NULL"'
     
     # Comp instance guide_0, placement and parameters
     guide_0 = instr.add_component('guide_0','Guide_anyshape_r')
@@ -1228,6 +1102,64 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     B1_monitor_xy.username2 = '"NULL"'
     B1_monitor_xy.username3 = '"NULL"'
     
+    # Comp instance B1_monitor_lam, placement and parameters
+    B1_monitor_lam = instr.add_component('B1_monitor_lam','Monitor_nD', AT=['0', '0', '1E-3'], AT_RELATIVE='B1_monitor_xy', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='B1_monitor_xy')
+    
+    B1_monitor_lam.user1 = '""'
+    B1_monitor_lam.user2 = '""'
+    B1_monitor_lam.user3 = '""'
+    B1_monitor_lam.xwidth = '0.060'
+    B1_monitor_lam.yheight = '0.084'
+    B1_monitor_lam.zdepth = '0'
+    B1_monitor_lam.xmin = '0'
+    B1_monitor_lam.xmax = '0'
+    B1_monitor_lam.ymin = '0'
+    B1_monitor_lam.ymax = '0'
+    B1_monitor_lam.zmin = '0'
+    B1_monitor_lam.zmax = '0'
+    B1_monitor_lam.bins = '0'
+    B1_monitor_lam.min = '-1e40'
+    B1_monitor_lam.max = '1e40'
+    B1_monitor_lam.restore_neutron = '1'
+    B1_monitor_lam.radius = '0'
+    B1_monitor_lam.options = '"lambda limits [0.05:3.0] bins = 130"'
+    B1_monitor_lam.filename = '"BW1_monitor_lam.dat"'
+    B1_monitor_lam.geometry = '"NULL"'
+    B1_monitor_lam.nowritefile = '0'
+    B1_monitor_lam.nexus_bins = '0'
+    B1_monitor_lam.username1 = '"NULL"'
+    B1_monitor_lam.username2 = '"NULL"'
+    B1_monitor_lam.username3 = '"NULL"'
+    
+    # Comp instance BW1_monitor_ToF, placement and parameters
+    BW1_monitor_ToF = instr.add_component('BW1_monitor_ToF','Monitor_nD', AT=['0', '0', '1E-3'], AT_RELATIVE='B1_monitor_lam', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='B1_monitor_lam')
+    
+    BW1_monitor_ToF.user1 = '""'
+    BW1_monitor_ToF.user2 = '""'
+    BW1_monitor_ToF.user3 = '""'
+    BW1_monitor_ToF.xwidth = '0.06'
+    BW1_monitor_ToF.yheight = '0.084'
+    BW1_monitor_ToF.zdepth = '0'
+    BW1_monitor_ToF.xmin = '0'
+    BW1_monitor_ToF.xmax = '0'
+    BW1_monitor_ToF.ymin = '0'
+    BW1_monitor_ToF.ymax = '0'
+    BW1_monitor_ToF.zmin = '0'
+    BW1_monitor_ToF.zmax = '0'
+    BW1_monitor_ToF.bins = '0'
+    BW1_monitor_ToF.min = '-1e40'
+    BW1_monitor_ToF.max = '1e40'
+    BW1_monitor_ToF.restore_neutron = '1'
+    BW1_monitor_ToF.radius = '0'
+    BW1_monitor_ToF.options = 'setBW1'
+    BW1_monitor_ToF.filename = '"BW1_monitor_tof.dat"'
+    BW1_monitor_ToF.geometry = '"NULL"'
+    BW1_monitor_ToF.nowritefile = '0'
+    BW1_monitor_ToF.nexus_bins = '0'
+    BW1_monitor_ToF.username1 = '"NULL"'
+    BW1_monitor_ToF.username2 = '"NULL"'
+    BW1_monitor_ToF.username3 = '"NULL"'
+    
     # Comp instance guide_49, placement and parameters
     guide_49 = instr.add_component('guide_49','Guide_anyshape_r')
     
@@ -1380,6 +1312,64 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     B2_monitor_xy.username1 = '"NULL"'
     B2_monitor_xy.username2 = '"NULL"'
     B2_monitor_xy.username3 = '"NULL"'
+    
+    # Comp instance BW2_monitor_lam, placement and parameters
+    BW2_monitor_lam = instr.add_component('BW2_monitor_lam','Monitor_nD', AT=['0', '0', '1E-3'], AT_RELATIVE='B2_monitor_xy', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='B2_monitor_xy')
+    
+    BW2_monitor_lam.user1 = '""'
+    BW2_monitor_lam.user2 = '""'
+    BW2_monitor_lam.user3 = '""'
+    BW2_monitor_lam.xwidth = '0.060'
+    BW2_monitor_lam.yheight = '0.084'
+    BW2_monitor_lam.zdepth = '0'
+    BW2_monitor_lam.xmin = '0'
+    BW2_monitor_lam.xmax = '0'
+    BW2_monitor_lam.ymin = '0'
+    BW2_monitor_lam.ymax = '0'
+    BW2_monitor_lam.zmin = '0'
+    BW2_monitor_lam.zmax = '0'
+    BW2_monitor_lam.bins = '0'
+    BW2_monitor_lam.min = '-1e40'
+    BW2_monitor_lam.max = '1e40'
+    BW2_monitor_lam.restore_neutron = '1'
+    BW2_monitor_lam.radius = '0'
+    BW2_monitor_lam.options = '"lambda limits [0.05:3.0] bins = 130"'
+    BW2_monitor_lam.filename = '"BW2_monitor_lam.dat"'
+    BW2_monitor_lam.geometry = '"NULL"'
+    BW2_monitor_lam.nowritefile = '0'
+    BW2_monitor_lam.nexus_bins = '0'
+    BW2_monitor_lam.username1 = '"NULL"'
+    BW2_monitor_lam.username2 = '"NULL"'
+    BW2_monitor_lam.username3 = '"NULL"'
+    
+    # Comp instance BW2_monitor_ToF, placement and parameters
+    BW2_monitor_ToF = instr.add_component('BW2_monitor_ToF','Monitor_nD', AT=['0.03140505829452013', '0.0', '40.1'], ROTATED=['0', '0.162739331227240', '0'])
+    
+    BW2_monitor_ToF.user1 = '""'
+    BW2_monitor_ToF.user2 = '""'
+    BW2_monitor_ToF.user3 = '""'
+    BW2_monitor_ToF.xwidth = '0.06'
+    BW2_monitor_ToF.yheight = '0.084'
+    BW2_monitor_ToF.zdepth = '0'
+    BW2_monitor_ToF.xmin = '0'
+    BW2_monitor_ToF.xmax = '0'
+    BW2_monitor_ToF.ymin = '0'
+    BW2_monitor_ToF.ymax = '0'
+    BW2_monitor_ToF.zmin = '0'
+    BW2_monitor_ToF.zmax = '0'
+    BW2_monitor_ToF.bins = '0'
+    BW2_monitor_ToF.min = '-1e40'
+    BW2_monitor_ToF.max = '1e40'
+    BW2_monitor_ToF.restore_neutron = '1'
+    BW2_monitor_ToF.radius = '0'
+    BW2_monitor_ToF.options = 'setBW2'
+    BW2_monitor_ToF.filename = '"BW2_monitor_tof.dat"'
+    BW2_monitor_ToF.geometry = '"NULL"'
+    BW2_monitor_ToF.nowritefile = '0'
+    BW2_monitor_ToF.nexus_bins = '0'
+    BW2_monitor_ToF.username1 = '"NULL"'
+    BW2_monitor_ToF.username2 = '"NULL"'
+    BW2_monitor_ToF.username3 = '"NULL"'
     
     # Comp instance guide_57, placement and parameters
     guide_57 = instr.add_component('guide_57','Guide_anyshape_r')
@@ -2056,46 +2046,58 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     guide_101.W = '0'
     guide_101.geometry = '"./OFF_files/try101.off"'
     
-    # Comp instance PulseShapingChopper1, placement and parameters
-    PulseShapingChopper1 = instr.add_component('PulseShapingChopper1','MultiDiskChopper', AT=['0.4108460115539497', '0.0', '107.95'], ROTATED=['0', '0.430122381481144', '0'])
+    # Comp instance PSC1, placement and parameters
+    PSC1 = instr.add_component('PSC1','DiskChopper', AT=['0.4108460115539497', '0.0', '107.95'], ROTATED=['0', '0.430122381481144', '180'])
     
-    PulseShapingChopper1.slit_center = 'theta_pos_P1'
-    PulseShapingChopper1.slit_width = 'theta_width_P1'
-    PulseShapingChopper1.nslits = 'nslits_P1'
-    PulseShapingChopper1.delta_y = 'delta_y_P1'
-    PulseShapingChopper1.nu = 'f_P1'
-    PulseShapingChopper1.nrev = '0'
-    PulseShapingChopper1.ratio = '1'
-    PulseShapingChopper1.jitter = '0'
-    PulseShapingChopper1.delay = 'delay_P1'
-    PulseShapingChopper1.isfirst = '0'
-    PulseShapingChopper1.phase = '0'
-    PulseShapingChopper1.radius = 'radius_P1'
-    PulseShapingChopper1.equal = '0'
-    PulseShapingChopper1.abs_out = '0'
-    PulseShapingChopper1.verbose = '0'
+    PSC1.theta_0 = 'P_slit'
+    PSC1.radius = '0.35'
+    PSC1.yheight = '0.095'
+    PSC1.nu = 'f_P1'
+    PSC1.nslit = '2'
+    PSC1.jitter = '0'
+    PSC1.delay = 'tof_P1'
+    PSC1.isfirst = '0'
+    PSC1.n_pulse = '1'
+    PSC1.abs_out = '1'
+    PSC1.phase = '0'
+    PSC1.xwidth = '0'
+    PSC1.verbose = '0'
     
-    # Comp instance PulseShapingChopper2, placement and parameters
-    PulseShapingChopper2 = instr.add_component('PulseShapingChopper2','MultiDiskChopper', AT=['0.41159673083080733', '0.0', '108.05'], ROTATED=['0', '0.430122381481144', '0'])
+    # Comp instance PSC2, placement and parameters
+    PSC2 = instr.add_component('PSC2','DiskChopper', AT=['0.41159673083080733', '0.0', '108.05'], ROTATED=['0', '0.430122381481144', '180'])
     
-    PulseShapingChopper2.slit_center = 'theta_pos_P2'
-    PulseShapingChopper2.slit_width = 'theta_width_P2'
-    PulseShapingChopper2.nslits = 'nslits_P2'
-    PulseShapingChopper2.delta_y = 'delta_y_P2'
-    PulseShapingChopper2.nu = 'f_P2'
-    PulseShapingChopper2.nrev = '0'
-    PulseShapingChopper2.ratio = '1'
-    PulseShapingChopper2.jitter = '0'
-    PulseShapingChopper2.delay = 'delay_P2'
-    PulseShapingChopper2.isfirst = '0'
-    PulseShapingChopper2.phase = '0'
-    PulseShapingChopper2.radius = 'radius_P2'
-    PulseShapingChopper2.equal = '0'
-    PulseShapingChopper2.abs_out = '0'
-    PulseShapingChopper2.verbose = '0'
+    PSC2.theta_0 = 'P_slit'
+    PSC2.radius = '0.35'
+    PSC2.yheight = '0.095'
+    PSC2.nu = 'f_P2'
+    PSC2.nslit = '2'
+    PSC2.jitter = '0'
+    PSC2.delay = 'tof_P2'
+    PSC2.isfirst = '0'
+    PSC2.n_pulse = '1'
+    PSC2.abs_out = '1'
+    PSC2.phase = '0'
+    PSC2.xwidth = '0'
+    PSC2.verbose = '0'
+    
+    # Comp instance P_monitor_LMon, placement and parameters
+    P_monitor_LMon = instr.add_component('P_monitor_LMon','L_monitor', AT=['0', '0', '1E-6'], AT_RELATIVE='PSC2', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='PSC2')
+    
+    P_monitor_LMon.nL = '20'
+    P_monitor_LMon.filename = '"Test_LMonitor_PChopper.dat"'
+    P_monitor_LMon.nowritefile = '0'
+    P_monitor_LMon.xmin = '-0.05'
+    P_monitor_LMon.xmax = '0.05'
+    P_monitor_LMon.ymin = '-0.05'
+    P_monitor_LMon.ymax = '0.05'
+    P_monitor_LMon.xwidth = '0.06'
+    P_monitor_LMon.yheight = '0.084'
+    P_monitor_LMon.Lmin = '0.2'
+    P_monitor_LMon.Lmax = '3'
+    P_monitor_LMon.restore_neutron = '1'
     
     # Comp instance P_monitor_ToF, placement and parameters
-    P_monitor_ToF = instr.add_component('P_monitor_ToF','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='PulseShapingChopper2', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='PulseShapingChopper2')
+    P_monitor_ToF = instr.add_component('P_monitor_ToF','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='P_monitor_LMon', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='P_monitor_LMon')
     
     P_monitor_ToF.user1 = '""'
     P_monitor_ToF.user2 = '""'
@@ -2511,370 +2513,6 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     guide_124.W = '0'
     guide_124.geometry = '"./OFF_files/try124.off"'
     
-    # Comp instance FanChopper_1, placement and parameters
-    FanChopper_1 = instr.add_component('FanChopper_1','MultiDiskChopper', AT=['0.7379194611672716', '0.0', '151.51801'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_1.slit_center = 'theta_pos_FAN'
-    FanChopper_1.slit_width = 'theta_width_FAN'
-    FanChopper_1.nslits = 'nslits_FAN'
-    FanChopper_1.delta_y = 'delta_y_FAN'
-    FanChopper_1.nu = 'f_FAN1'
-    FanChopper_1.nrev = '0'
-    FanChopper_1.ratio = '1'
-    FanChopper_1.jitter = '0'
-    FanChopper_1.delay = 'delay_FAN1'
-    FanChopper_1.isfirst = '0'
-    FanChopper_1.phase = 'phase_FAN1'
-    FanChopper_1.radius = 'radius_FAN'
-    FanChopper_1.equal = '0'
-    FanChopper_1.abs_out = '0'
-    FanChopper_1.verbose = '0'
-    
-    # Comp instance FanChopper_2, placement and parameters
-    FanChopper_2 = instr.add_component('FanChopper_2','MultiDiskChopper', AT=['0.7379778170790591', '0.0', '151.52578333333332'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_2.slit_center = 'theta_pos_FAN'
-    FanChopper_2.slit_width = 'theta_width_FAN'
-    FanChopper_2.nslits = 'nslits_FAN'
-    FanChopper_2.delta_y = 'delta_y_FAN'
-    FanChopper_2.nu = 'f_FAN2'
-    FanChopper_2.nrev = '0'
-    FanChopper_2.ratio = '1'
-    FanChopper_2.jitter = '0'
-    FanChopper_2.delay = 'delay_FAN2'
-    FanChopper_2.isfirst = '0'
-    FanChopper_2.phase = 'phase_FAN2'
-    FanChopper_2.radius = 'radius_FAN'
-    FanChopper_2.equal = '0'
-    FanChopper_2.abs_out = '0'
-    FanChopper_2.verbose = '0'
-    
-    # Comp instance FanChopper_3, placement and parameters
-    FanChopper_3 = instr.add_component('FanChopper_3','MultiDiskChopper', AT=['0.738036172990847', '0.0', '151.53355666666667'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_3.slit_center = 'theta_pos_FAN'
-    FanChopper_3.slit_width = 'theta_width_FAN'
-    FanChopper_3.nslits = 'nslits_FAN'
-    FanChopper_3.delta_y = 'delta_y_FAN'
-    FanChopper_3.nu = 'f_FAN3'
-    FanChopper_3.nrev = '0'
-    FanChopper_3.ratio = '1'
-    FanChopper_3.jitter = '0'
-    FanChopper_3.delay = 'delay_FAN3'
-    FanChopper_3.isfirst = '0'
-    FanChopper_3.phase = 'phase_FAN3'
-    FanChopper_3.radius = 'radius_FAN'
-    FanChopper_3.equal = '0'
-    FanChopper_3.abs_out = '0'
-    FanChopper_3.verbose = '0'
-    
-    # Comp instance FanChopper_4, placement and parameters
-    FanChopper_4 = instr.add_component('FanChopper_4','MultiDiskChopper', AT=['0.7380945289026345', '0.0', '151.54133'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_4.slit_center = 'theta_pos_FAN'
-    FanChopper_4.slit_width = 'theta_width_FAN'
-    FanChopper_4.nslits = 'nslits_FAN'
-    FanChopper_4.delta_y = 'delta_y_FAN'
-    FanChopper_4.nu = 'f_FAN4'
-    FanChopper_4.nrev = '0'
-    FanChopper_4.ratio = '1'
-    FanChopper_4.jitter = '0'
-    FanChopper_4.delay = 'delay_FAN4'
-    FanChopper_4.isfirst = '0'
-    FanChopper_4.phase = 'phase_FAN4'
-    FanChopper_4.radius = 'radius_FAN'
-    FanChopper_4.equal = '0'
-    FanChopper_4.abs_out = '0'
-    FanChopper_4.verbose = '0'
-    
-    # Comp instance FanChopper_5, placement and parameters
-    FanChopper_5 = instr.add_component('FanChopper_5','MultiDiskChopper', AT=['0.7381528848144224', '0.0', '151.54910333333333'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_5.slit_center = 'theta_pos_FAN'
-    FanChopper_5.slit_width = 'theta_width_FAN'
-    FanChopper_5.nslits = 'nslits_FAN'
-    FanChopper_5.delta_y = 'delta_y_FAN'
-    FanChopper_5.nu = 'f_FAN5'
-    FanChopper_5.nrev = '0'
-    FanChopper_5.ratio = '1'
-    FanChopper_5.jitter = '0'
-    FanChopper_5.delay = 'delay_FAN5'
-    FanChopper_5.isfirst = '0'
-    FanChopper_5.phase = 'phase_FAN5'
-    FanChopper_5.radius = 'radius_FAN'
-    FanChopper_5.equal = '0'
-    FanChopper_5.abs_out = '0'
-    FanChopper_5.verbose = '0'
-    
-    # Comp instance FanChopper_6, placement and parameters
-    FanChopper_6 = instr.add_component('FanChopper_6','MultiDiskChopper', AT=['0.7382112407262101', '0.0', '151.55687666666665'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_6.slit_center = 'theta_pos_FAN'
-    FanChopper_6.slit_width = 'theta_width_FAN'
-    FanChopper_6.nslits = 'nslits_FAN'
-    FanChopper_6.delta_y = 'delta_y_FAN'
-    FanChopper_6.nu = 'f_FAN6'
-    FanChopper_6.nrev = '0'
-    FanChopper_6.ratio = '1'
-    FanChopper_6.jitter = '0'
-    FanChopper_6.delay = 'delay_FAN6'
-    FanChopper_6.isfirst = '0'
-    FanChopper_6.phase = 'phase_FAN6'
-    FanChopper_6.radius = 'radius_FAN'
-    FanChopper_6.equal = '0'
-    FanChopper_6.abs_out = '0'
-    FanChopper_6.verbose = '0'
-    
-    # Comp instance FanChopper_7, placement and parameters
-    FanChopper_7 = instr.add_component('FanChopper_7','MultiDiskChopper', AT=['0.7382695966379978', '0.0', '151.56465'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_7.slit_center = 'theta_pos_FAN'
-    FanChopper_7.slit_width = 'theta_width_FAN'
-    FanChopper_7.nslits = 'nslits_FAN'
-    FanChopper_7.delta_y = 'delta_y_FAN'
-    FanChopper_7.nu = 'f_FAN7'
-    FanChopper_7.nrev = '0'
-    FanChopper_7.ratio = '1'
-    FanChopper_7.jitter = '0'
-    FanChopper_7.delay = 'delay_FAN7'
-    FanChopper_7.isfirst = '0'
-    FanChopper_7.phase = 'phase_FAN7'
-    FanChopper_7.radius = 'radius_FAN'
-    FanChopper_7.equal = '0'
-    FanChopper_7.abs_out = '0'
-    FanChopper_7.verbose = '0'
-    
-    # Comp instance FanChopper_8, placement and parameters
-    FanChopper_8 = instr.add_component('FanChopper_8','MultiDiskChopper', AT=['0.7383279525497856', '0.0', '151.57242333333332'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_8.slit_center = 'theta_pos_FAN'
-    FanChopper_8.slit_width = 'theta_width_FAN'
-    FanChopper_8.nslits = 'nslits_FAN'
-    FanChopper_8.delta_y = 'delta_y_FAN'
-    FanChopper_8.nu = 'f_FAN8'
-    FanChopper_8.nrev = '0'
-    FanChopper_8.ratio = '1'
-    FanChopper_8.jitter = '0'
-    FanChopper_8.delay = 'delay_FAN8'
-    FanChopper_8.isfirst = '0'
-    FanChopper_8.phase = 'phase_FAN8'
-    FanChopper_8.radius = 'radius_FAN'
-    FanChopper_8.equal = '0'
-    FanChopper_8.abs_out = '0'
-    FanChopper_8.verbose = '0'
-    
-    # Comp instance FanChopper_9, placement and parameters
-    FanChopper_9 = instr.add_component('FanChopper_9','MultiDiskChopper', AT=['0.7383863084615735', '0.0', '151.58019666666667'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_9.slit_center = 'theta_pos_FAN'
-    FanChopper_9.slit_width = 'theta_width_FAN'
-    FanChopper_9.nslits = 'nslits_FAN'
-    FanChopper_9.delta_y = 'delta_y_FAN'
-    FanChopper_9.nu = 'f_FAN9'
-    FanChopper_9.nrev = '0'
-    FanChopper_9.ratio = '1'
-    FanChopper_9.jitter = '0'
-    FanChopper_9.delay = 'delay_FAN9'
-    FanChopper_9.isfirst = '0'
-    FanChopper_9.phase = 'phase_FAN9'
-    FanChopper_9.radius = 'radius_FAN'
-    FanChopper_9.equal = '0'
-    FanChopper_9.abs_out = '0'
-    FanChopper_9.verbose = '0'
-    
-    # Comp instance FanChopper_10, placement and parameters
-    FanChopper_10 = instr.add_component('FanChopper_10','MultiDiskChopper', AT=['0.738444664373361', '0.0', '151.58796999999998'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    FanChopper_10.slit_center = 'theta_pos_FAN'
-    FanChopper_10.slit_width = 'theta_width_FAN'
-    FanChopper_10.nslits = 'nslits_FAN'
-    FanChopper_10.delta_y = 'delta_y_FAN'
-    FanChopper_10.nu = 'f_FAN10'
-    FanChopper_10.nrev = '0'
-    FanChopper_10.ratio = '1'
-    FanChopper_10.jitter = '0'
-    FanChopper_10.delay = 'delay_FAN10'
-    FanChopper_10.isfirst = '0'
-    FanChopper_10.phase = 'phase_FAN10'
-    FanChopper_10.radius = 'radius_FAN'
-    FanChopper_10.equal = '0'
-    FanChopper_10.abs_out = '0'
-    FanChopper_10.verbose = '0'
-    
-    # Comp instance F_monitor_flux, placement and parameters
-    F_monitor_flux = instr.add_component('F_monitor_flux','Monitor_nD', AT=['0.7384448145172166', '0.0', '151.58799'], ROTATED=['0', '0.430122381481144', '0'])
-    
-    F_monitor_flux.user1 = '""'
-    F_monitor_flux.user2 = '""'
-    F_monitor_flux.user3 = '""'
-    F_monitor_flux.xwidth = '0.040'
-    F_monitor_flux.yheight = '0.050'
-    F_monitor_flux.zdepth = '0'
-    F_monitor_flux.xmin = '0'
-    F_monitor_flux.xmax = '0'
-    F_monitor_flux.ymin = '0'
-    F_monitor_flux.ymax = '0'
-    F_monitor_flux.zmin = '0'
-    F_monitor_flux.zmax = '0'
-    F_monitor_flux.bins = '0'
-    F_monitor_flux.min = '-1e40'
-    F_monitor_flux.max = '1e40'
-    F_monitor_flux.restore_neutron = '1'
-    F_monitor_flux.radius = '0'
-    F_monitor_flux.options = '"flux bins=1"'
-    F_monitor_flux.filename = '"F_flux.dat"'
-    F_monitor_flux.geometry = '"NULL"'
-    F_monitor_flux.nowritefile = '0'
-    F_monitor_flux.nexus_bins = '0'
-    F_monitor_flux.username1 = '"NULL"'
-    F_monitor_flux.username2 = '"NULL"'
-    F_monitor_flux.username3 = '"NULL"'
-    
-    # Comp instance F_monitor_hdiv, placement and parameters
-    F_monitor_hdiv = instr.add_component('F_monitor_hdiv','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='F_monitor_flux', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='F_monitor_flux')
-    
-    F_monitor_hdiv.user1 = '""'
-    F_monitor_hdiv.user2 = '""'
-    F_monitor_hdiv.user3 = '""'
-    F_monitor_hdiv.xwidth = '0.040'
-    F_monitor_hdiv.yheight = '0.050'
-    F_monitor_hdiv.zdepth = '0'
-    F_monitor_hdiv.xmin = '0'
-    F_monitor_hdiv.xmax = '0'
-    F_monitor_hdiv.ymin = '0'
-    F_monitor_hdiv.ymax = '0'
-    F_monitor_hdiv.zmin = '0'
-    F_monitor_hdiv.zmax = '0'
-    F_monitor_hdiv.bins = '0'
-    F_monitor_hdiv.min = '-1e40'
-    F_monitor_hdiv.max = '1e40'
-    F_monitor_hdiv.restore_neutron = '1'
-    F_monitor_hdiv.radius = '0'
-    F_monitor_hdiv.options = '"hdiv limits [-2.0:2.0] bins = 100"'
-    F_monitor_hdiv.filename = '"F_monitor_hdiv.dat"'
-    F_monitor_hdiv.geometry = '"NULL"'
-    F_monitor_hdiv.nowritefile = '0'
-    F_monitor_hdiv.nexus_bins = '0'
-    F_monitor_hdiv.username1 = '"NULL"'
-    F_monitor_hdiv.username2 = '"NULL"'
-    F_monitor_hdiv.username3 = '"NULL"'
-    
-    # Comp instance F_monitor_vdiv, placement and parameters
-    F_monitor_vdiv = instr.add_component('F_monitor_vdiv','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='F_monitor_hdiv', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='F_monitor_hdiv')
-    
-    F_monitor_vdiv.user1 = '""'
-    F_monitor_vdiv.user2 = '""'
-    F_monitor_vdiv.user3 = '""'
-    F_monitor_vdiv.xwidth = '0.040'
-    F_monitor_vdiv.yheight = '0.050'
-    F_monitor_vdiv.zdepth = '0'
-    F_monitor_vdiv.xmin = '0'
-    F_monitor_vdiv.xmax = '0'
-    F_monitor_vdiv.ymin = '0'
-    F_monitor_vdiv.ymax = '0'
-    F_monitor_vdiv.zmin = '0'
-    F_monitor_vdiv.zmax = '0'
-    F_monitor_vdiv.bins = '0'
-    F_monitor_vdiv.min = '-1e40'
-    F_monitor_vdiv.max = '1e40'
-    F_monitor_vdiv.restore_neutron = '1'
-    F_monitor_vdiv.radius = '0'
-    F_monitor_vdiv.options = '"vdiv limits [-2.0:2.0] bins = 100"'
-    F_monitor_vdiv.filename = '"F_monitor_vdiv.dat"'
-    F_monitor_vdiv.geometry = '"NULL"'
-    F_monitor_vdiv.nowritefile = '0'
-    F_monitor_vdiv.nexus_bins = '0'
-    F_monitor_vdiv.username1 = '"NULL"'
-    F_monitor_vdiv.username2 = '"NULL"'
-    F_monitor_vdiv.username3 = '"NULL"'
-    
-    # Comp instance F_monitor_lam, placement and parameters
-    F_monitor_lam = instr.add_component('F_monitor_lam','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='F_monitor_vdiv', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='F_monitor_vdiv')
-    
-    F_monitor_lam.user1 = '""'
-    F_monitor_lam.user2 = '""'
-    F_monitor_lam.user3 = '""'
-    F_monitor_lam.xwidth = '0.040'
-    F_monitor_lam.yheight = '0.050'
-    F_monitor_lam.zdepth = '0'
-    F_monitor_lam.xmin = '0'
-    F_monitor_lam.xmax = '0'
-    F_monitor_lam.ymin = '0'
-    F_monitor_lam.ymax = '0'
-    F_monitor_lam.zmin = '0'
-    F_monitor_lam.zmax = '0'
-    F_monitor_lam.bins = '0'
-    F_monitor_lam.min = '-1e40'
-    F_monitor_lam.max = '1e40'
-    F_monitor_lam.restore_neutron = '1'
-    F_monitor_lam.radius = '0'
-    F_monitor_lam.options = '"lambda limits [0.5:5] bins = 1301"'
-    F_monitor_lam.filename = '"F_monitor_lam.dat"'
-    F_monitor_lam.geometry = '"NULL"'
-    F_monitor_lam.nowritefile = '0'
-    F_monitor_lam.nexus_bins = '0'
-    F_monitor_lam.username1 = '"NULL"'
-    F_monitor_lam.username2 = '"NULL"'
-    F_monitor_lam.username3 = '"NULL"'
-    
-    # Comp instance F_monitor_ToF, placement and parameters
-    F_monitor_ToF = instr.add_component('F_monitor_ToF','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='F_monitor_lam', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='F_monitor_lam')
-    
-    F_monitor_ToF.user1 = '""'
-    F_monitor_ToF.user2 = '""'
-    F_monitor_ToF.user3 = '""'
-    F_monitor_ToF.xwidth = '0.04'
-    F_monitor_ToF.yheight = '0.05'
-    F_monitor_ToF.zdepth = '0'
-    F_monitor_ToF.xmin = '0'
-    F_monitor_ToF.xmax = '0'
-    F_monitor_ToF.ymin = '0'
-    F_monitor_ToF.ymax = '0'
-    F_monitor_ToF.zmin = '0'
-    F_monitor_ToF.zmax = '0'
-    F_monitor_ToF.bins = '0'
-    F_monitor_ToF.min = '-1e40'
-    F_monitor_ToF.max = '1e40'
-    F_monitor_ToF.restore_neutron = '1'
-    F_monitor_ToF.radius = '0'
-    F_monitor_ToF.options = 'setFAN'
-    F_monitor_ToF.filename = '"F_monitor_tof.dat"'
-    F_monitor_ToF.geometry = '"NULL"'
-    F_monitor_ToF.nowritefile = '0'
-    F_monitor_ToF.nexus_bins = '0'
-    F_monitor_ToF.username1 = '"NULL"'
-    F_monitor_ToF.username2 = '"NULL"'
-    F_monitor_ToF.username3 = '"NULL"'
-    
-    # Comp instance F_monitor_xy, placement and parameters
-    F_monitor_xy = instr.add_component('F_monitor_xy','Monitor_nD', AT=['0.7384448145172166', '0.0', '151.58799'], ROTATED=['0', '0.430122381481145', '0'])
-    
-    F_monitor_xy.user1 = '""'
-    F_monitor_xy.user2 = '""'
-    F_monitor_xy.user3 = '""'
-    F_monitor_xy.xwidth = '0.050'
-    F_monitor_xy.yheight = '0.065'
-    F_monitor_xy.zdepth = '0'
-    F_monitor_xy.xmin = '0'
-    F_monitor_xy.xmax = '0'
-    F_monitor_xy.ymin = '0'
-    F_monitor_xy.ymax = '0'
-    F_monitor_xy.zmin = '0'
-    F_monitor_xy.zmax = '0'
-    F_monitor_xy.bins = '0'
-    F_monitor_xy.min = '-1e40'
-    F_monitor_xy.max = '1e40'
-    F_monitor_xy.restore_neutron = '1'
-    F_monitor_xy.radius = '0'
-    F_monitor_xy.options = '"x limits [-0.025:0.025] bins = 100, y limits [-0.0325:0.0325] bins = 100"'
-    F_monitor_xy.filename = '"F_monitor_xy.dat"'
-    F_monitor_xy.geometry = '"NULL"'
-    F_monitor_xy.nowritefile = '0'
-    F_monitor_xy.nexus_bins = '0'
-    F_monitor_xy.username1 = '"NULL"'
-    F_monitor_xy.username2 = '"NULL"'
-    F_monitor_xy.username3 = '"NULL"'
-    
     # Comp instance guide_126, placement and parameters
     guide_126 = instr.add_component('guide_126','Guide_anyshape_r')
     
@@ -3041,41 +2679,37 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     guide_136.geometry = '"./OFF_files/try136.off"'
     
     # Comp instance MonochromatingChopper1, placement and parameters
-    MonochromatingChopper1 = instr.add_component('MonochromatingChopper1','MultiDiskChopper', AT=['0.8166097806955753', '0.0', '162.0 -0.005'], ROTATED=['0', '0.430122381481144', '0'])
+    MonochromatingChopper1 = instr.add_component('MonochromatingChopper1','DiskChopper', AT=['0.8166097806955753', '0.0', '161.995'], ROTATED=['0', '0.430122381481144', '0'])
     
-    MonochromatingChopper1.slit_center = 'theta_pos_M1'
-    MonochromatingChopper1.slit_width = 'theta_width_M1'
-    MonochromatingChopper1.nslits = 'nslits_M1'
-    MonochromatingChopper1.delta_y = 'delta_y_M1'
+    MonochromatingChopper1.theta_0 = 'M_slit'
+    MonochromatingChopper1.radius = '0.35'
+    MonochromatingChopper1.yheight = '0.045'
     MonochromatingChopper1.nu = 'f_M1'
-    MonochromatingChopper1.nrev = '0'
-    MonochromatingChopper1.ratio = '1'
+    MonochromatingChopper1.nslit = '1'
     MonochromatingChopper1.jitter = '0'
-    MonochromatingChopper1.delay = 'delay_M1'
+    MonochromatingChopper1.delay = 'tof_M1'
     MonochromatingChopper1.isfirst = '0'
-    MonochromatingChopper1.phase = 'phase_M'
-    MonochromatingChopper1.radius = 'radius_M1'
-    MonochromatingChopper1.equal = '0'
-    MonochromatingChopper1.abs_out = '0'
+    MonochromatingChopper1.n_pulse = '1'
+    MonochromatingChopper1.abs_out = '1'
+    MonochromatingChopper1.phase = '0'
+    MonochromatingChopper1.xwidth = '0'
     MonochromatingChopper1.verbose = '0'
     
     # Comp instance MonochromatingChopper2, placement and parameters
-    MonochromatingChopper2 = instr.add_component('MonochromatingChopper2','MultiDiskChopper', AT=['0.8166097806955753', '0.0', '162.0 + 0.005'], ROTATED=['0', '0.430122381481144', '0'])
+    MonochromatingChopper2 = instr.add_component('MonochromatingChopper2','DiskChopper', AT=['0.8166097806955753', '0.0', '162.005'], ROTATED=['0', '0.430122381481144', '180'])
     
-    MonochromatingChopper2.slit_center = 'theta_pos_M2'
-    MonochromatingChopper2.slit_width = 'theta_width_M2'
-    MonochromatingChopper2.nslits = 'nslits_M2'
-    MonochromatingChopper2.delta_y = 'delta_y_M2'
-    MonochromatingChopper2.nu = 'f_M2'
-    MonochromatingChopper2.nrev = '0'
-    MonochromatingChopper2.ratio = '1'
+    MonochromatingChopper2.theta_0 = 'M_slit'
+    MonochromatingChopper2.radius = '0.35'
+    MonochromatingChopper2.yheight = '0.045'
+    MonochromatingChopper2.nu = '- f_M1'
+    MonochromatingChopper2.nslit = '1'
     MonochromatingChopper2.jitter = '0'
-    MonochromatingChopper2.delay = 'delay_M2'
+    MonochromatingChopper2.delay = 'tof_M2'
     MonochromatingChopper2.isfirst = '0'
-    MonochromatingChopper2.phase = 'phase_M'
-    MonochromatingChopper2.radius = 'radius_M2'
-    MonochromatingChopper2.equal = '0'
-    MonochromatingChopper2.abs_out = '0'
+    MonochromatingChopper2.n_pulse = '1'
+    MonochromatingChopper2.abs_out = '1'
+    MonochromatingChopper2.phase = '0'
+    MonochromatingChopper2.xwidth = '0'
     MonochromatingChopper2.verbose = '0'
     
     # Comp instance M_monitor_flux, placement and parameters
@@ -3107,8 +2741,24 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     M_monitor_flux.username2 = '"NULL"'
     M_monitor_flux.username3 = '"NULL"'
     
+    # Comp instance M_monitor_LMon, placement and parameters
+    M_monitor_LMon = instr.add_component('M_monitor_LMon','L_monitor', AT=['0', '0', '1E-6'], AT_RELATIVE='M_monitor_flux', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='M_monitor_flux')
+    
+    M_monitor_LMon.nL = '20'
+    M_monitor_LMon.filename = '"Test_LMonitor_MChopper.dat"'
+    M_monitor_LMon.nowritefile = '0'
+    M_monitor_LMon.xmin = '-0.05'
+    M_monitor_LMon.xmax = '0.05'
+    M_monitor_LMon.ymin = '-0.05'
+    M_monitor_LMon.ymax = '0.05'
+    M_monitor_LMon.xwidth = '0.06'
+    M_monitor_LMon.yheight = '0.084'
+    M_monitor_LMon.Lmin = '0.2'
+    M_monitor_LMon.Lmax = '3'
+    M_monitor_LMon.restore_neutron = '1'
+    
     # Comp instance M_monitor_hdiv, placement and parameters
-    M_monitor_hdiv = instr.add_component('M_monitor_hdiv','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='M_monitor_flux', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='M_monitor_flux')
+    M_monitor_hdiv = instr.add_component('M_monitor_hdiv','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='M_monitor_LMon', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='M_monitor_LMon')
     
     M_monitor_hdiv.user1 = '""'
     M_monitor_hdiv.user2 = '""'
@@ -3185,7 +2835,7 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     M_monitor_lam.max = '1e40'
     M_monitor_lam.restore_neutron = '1'
     M_monitor_lam.radius = '0'
-    M_monitor_lam.options = '"lambda limits [.5:5] bins = 1301"'
+    M_monitor_lam.options = 'setML'
     M_monitor_lam.filename = '"M_monitor_lam.dat"'
     M_monitor_lam.geometry = '"NULL"'
     M_monitor_lam.nowritefile = '0'
@@ -3381,305 +3031,105 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     Sample_pos = instr.add_component('Sample_pos','Arm', AT=['0.8301227276790154', '0.0', '163.8'], ROTATED=['0', '0.430122381481144', '0'])
     
     
-    # Comp instance sample_monitor_xy, placement and parameters
-    sample_monitor_xy = instr.add_component('sample_monitor_xy','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='Sample_pos', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Sample_pos')
+    # Comp instance Cheat_lambda_tof_monitor, placement and parameters
+    Cheat_lambda_tof_monitor = instr.add_component('Cheat_lambda_tof_monitor','Monitor_nD', AT=['0', '0', '0'], AT_RELATIVE='Sample_pos', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Sample_pos')
     
-    sample_monitor_xy.user1 = '""'
-    sample_monitor_xy.user2 = '""'
-    sample_monitor_xy.user3 = '""'
-    sample_monitor_xy.xwidth = '0.1'
-    sample_monitor_xy.yheight = '0.05'
-    sample_monitor_xy.zdepth = '0'
-    sample_monitor_xy.xmin = '0'
-    sample_monitor_xy.xmax = '0'
-    sample_monitor_xy.ymin = '0'
-    sample_monitor_xy.ymax = '0'
-    sample_monitor_xy.zmin = '0'
-    sample_monitor_xy.zmax = '0'
-    sample_monitor_xy.bins = '0'
-    sample_monitor_xy.min = '-1e40'
-    sample_monitor_xy.max = '1e40'
-    sample_monitor_xy.restore_neutron = '1'
-    sample_monitor_xy.radius = '0'
-    sample_monitor_xy.options = '"x limits [-0.05:0.05] bins = 100, y limits [-0.025:0.025] bins = 100"'
-    sample_monitor_xy.filename = '"sample_monitor_xy.dat"'
-    sample_monitor_xy.geometry = '"NULL"'
-    sample_monitor_xy.nowritefile = '0'
-    sample_monitor_xy.nexus_bins = '0'
-    sample_monitor_xy.username1 = '"NULL"'
-    sample_monitor_xy.username2 = '"NULL"'
-    sample_monitor_xy.username3 = '"NULL"'
+    Cheat_lambda_tof_monitor.user1 = '""'
+    Cheat_lambda_tof_monitor.user2 = '""'
+    Cheat_lambda_tof_monitor.user3 = '""'
+    Cheat_lambda_tof_monitor.xwidth = '0.055'
+    Cheat_lambda_tof_monitor.yheight = '0.075'
+    Cheat_lambda_tof_monitor.zdepth = '0'
+    Cheat_lambda_tof_monitor.xmin = '0'
+    Cheat_lambda_tof_monitor.xmax = '0'
+    Cheat_lambda_tof_monitor.ymin = '0'
+    Cheat_lambda_tof_monitor.ymax = '0'
+    Cheat_lambda_tof_monitor.zmin = '0'
+    Cheat_lambda_tof_monitor.zmax = '0'
+    Cheat_lambda_tof_monitor.bins = '0'
+    Cheat_lambda_tof_monitor.min = '-1e40'
+    Cheat_lambda_tof_monitor.max = '1e40'
+    Cheat_lambda_tof_monitor.restore_neutron = '1'
+    Cheat_lambda_tof_monitor.radius = '0'
+    Cheat_lambda_tof_monitor.options = '"lambda bins = 201 limits [4 : 6], t bins=201 limits [0.16 : 0.25]"'
+    Cheat_lambda_tof_monitor.filename = '"sample_monitor_lam.dat"'
+    Cheat_lambda_tof_monitor.geometry = '"NULL"'
+    Cheat_lambda_tof_monitor.nowritefile = '0'
+    Cheat_lambda_tof_monitor.nexus_bins = '0'
+    Cheat_lambda_tof_monitor.username1 = '"NULL"'
+    Cheat_lambda_tof_monitor.username2 = '"NULL"'
+    Cheat_lambda_tof_monitor.username3 = '"NULL"'
+
+    # Comp instance P_monitor_ToF, placement and parameters
+    P_monitor_ToF2 = instr.add_component('P_monitor_ToF_2','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='Sample_pos', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Sample_pos')
     
-    # Comp instance sample_monitor_div, placement and parameters
-    sample_monitor_div = instr.add_component('sample_monitor_div','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_xy', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_xy')
+    P_monitor_ToF2.user1 = '""'
+    P_monitor_ToF2.user2 = '""'
+    P_monitor_ToF2.user3 = '""'
+    P_monitor_ToF2.xwidth = '0.06'
+    P_monitor_ToF2.yheight = '0.084'
+    P_monitor_ToF2.zdepth = '0'
+    P_monitor_ToF2.xmin = '0'
+    P_monitor_ToF2.xmax = '0'
+    P_monitor_ToF2.ymin = '0'
+    P_monitor_ToF2.ymax = '0'
+    P_monitor_ToF2.zmin = '0'
+    P_monitor_ToF2.zmax = '0'
+    P_monitor_ToF2.bins = '0'
+    P_monitor_ToF2.min = '-1e40'
+    P_monitor_ToF2.max = '1e40'
+    P_monitor_ToF2.restore_neutron = '1'
+    P_monitor_ToF2.radius = '0'
+    P_monitor_ToF2.options = '"time limits [0.16 : 0.25] bins = 100"'
+    P_monitor_ToF2.filename = '"P_monitor_tof_2.dat"'
+    P_monitor_ToF2.geometry = '"NULL"'
+    P_monitor_ToF2.nowritefile = '0'
+    P_monitor_ToF2.nexus_bins = '0'
+    P_monitor_ToF2.username1 = '"NULL"'
+    P_monitor_ToF2.username2 = '"NULL"'
+    P_monitor_ToF2.username3 = '"NULL"'
     
-    sample_monitor_div.user1 = '""'
-    sample_monitor_div.user2 = '""'
-    sample_monitor_div.user3 = '""'
-    sample_monitor_div.xwidth = '0.055'
-    sample_monitor_div.yheight = '0.075'
-    sample_monitor_div.zdepth = '0'
-    sample_monitor_div.xmin = '0'
-    sample_monitor_div.xmax = '0'
-    sample_monitor_div.ymin = '0'
-    sample_monitor_div.ymax = '0'
-    sample_monitor_div.zmin = '0'
-    sample_monitor_div.zmax = '0'
-    sample_monitor_div.bins = '0'
-    sample_monitor_div.min = '-1e40'
-    sample_monitor_div.max = '1e40'
-    sample_monitor_div.restore_neutron = '1'
-    sample_monitor_div.radius = '0'
-    sample_monitor_div.options = '"hdiv limits [-1.5:1.5] bins = 100, vdiv limits [-1.0:1.0] bins = 100"'
-    sample_monitor_div.filename = '"sample_monitor_div.dat"'
-    sample_monitor_div.geometry = '"NULL"'
-    sample_monitor_div.nowritefile = '0'
-    sample_monitor_div.nexus_bins = '0'
-    sample_monitor_div.username1 = '"NULL"'
-    sample_monitor_div.username2 = '"NULL"'
-    sample_monitor_div.username3 = '"NULL"'
-    
-    # Comp instance sample_monitor_hdiv, placement and parameters
-    sample_monitor_hdiv = instr.add_component('sample_monitor_hdiv','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_div', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_div')
-    
-    sample_monitor_hdiv.user1 = '""'
-    sample_monitor_hdiv.user2 = '""'
-    sample_monitor_hdiv.user3 = '""'
-    sample_monitor_hdiv.xwidth = '0.055'
-    sample_monitor_hdiv.yheight = '0.075'
-    sample_monitor_hdiv.zdepth = '0'
-    sample_monitor_hdiv.xmin = '0'
-    sample_monitor_hdiv.xmax = '0'
-    sample_monitor_hdiv.ymin = '0'
-    sample_monitor_hdiv.ymax = '0'
-    sample_monitor_hdiv.zmin = '0'
-    sample_monitor_hdiv.zmax = '0'
-    sample_monitor_hdiv.bins = '0'
-    sample_monitor_hdiv.min = '-1e40'
-    sample_monitor_hdiv.max = '1e40'
-    sample_monitor_hdiv.restore_neutron = '1'
-    sample_monitor_hdiv.radius = '0'
-    sample_monitor_hdiv.options = '"hdiv limits [-2.0:2.0] bins = 100"'
-    sample_monitor_hdiv.filename = '"sample_monitor_hdiv.dat"'
-    sample_monitor_hdiv.geometry = '"NULL"'
-    sample_monitor_hdiv.nowritefile = '0'
-    sample_monitor_hdiv.nexus_bins = '0'
-    sample_monitor_hdiv.username1 = '"NULL"'
-    sample_monitor_hdiv.username2 = '"NULL"'
-    sample_monitor_hdiv.username3 = '"NULL"'
-    
-    # Comp instance sample_monitor_vdiv, placement and parameters
-    sample_monitor_vdiv = instr.add_component('sample_monitor_vdiv','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_hdiv', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_hdiv')
-    
-    sample_monitor_vdiv.user1 = '""'
-    sample_monitor_vdiv.user2 = '""'
-    sample_monitor_vdiv.user3 = '""'
-    sample_monitor_vdiv.xwidth = '0.055'
-    sample_monitor_vdiv.yheight = '0.075'
-    sample_monitor_vdiv.zdepth = '0'
-    sample_monitor_vdiv.xmin = '0'
-    sample_monitor_vdiv.xmax = '0'
-    sample_monitor_vdiv.ymin = '0'
-    sample_monitor_vdiv.ymax = '0'
-    sample_monitor_vdiv.zmin = '0'
-    sample_monitor_vdiv.zmax = '0'
-    sample_monitor_vdiv.bins = '0'
-    sample_monitor_vdiv.min = '-1e40'
-    sample_monitor_vdiv.max = '1e40'
-    sample_monitor_vdiv.restore_neutron = '1'
-    sample_monitor_vdiv.radius = '0'
-    sample_monitor_vdiv.options = '"vdiv limits [-2.0:2.0] bins = 100"'
-    sample_monitor_vdiv.filename = '"sample_monitor_vdiv.dat"'
-    sample_monitor_vdiv.geometry = '"NULL"'
-    sample_monitor_vdiv.nowritefile = '0'
-    sample_monitor_vdiv.nexus_bins = '0'
-    sample_monitor_vdiv.username1 = '"NULL"'
-    sample_monitor_vdiv.username2 = '"NULL"'
-    sample_monitor_vdiv.username3 = '"NULL"'
-    
-    # Comp instance sample_monitor_xhdiv, placement and parameters
-    sample_monitor_xhdiv = instr.add_component('sample_monitor_xhdiv','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_vdiv', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_vdiv')
-    
-    sample_monitor_xhdiv.user1 = '""'
-    sample_monitor_xhdiv.user2 = '""'
-    sample_monitor_xhdiv.user3 = '""'
-    sample_monitor_xhdiv.xwidth = '0.055'
-    sample_monitor_xhdiv.yheight = '0.075'
-    sample_monitor_xhdiv.zdepth = '0'
-    sample_monitor_xhdiv.xmin = '0'
-    sample_monitor_xhdiv.xmax = '0'
-    sample_monitor_xhdiv.ymin = '0'
-    sample_monitor_xhdiv.ymax = '0'
-    sample_monitor_xhdiv.zmin = '0'
-    sample_monitor_xhdiv.zmax = '0'
-    sample_monitor_xhdiv.bins = '0'
-    sample_monitor_xhdiv.min = '-1e40'
-    sample_monitor_xhdiv.max = '1e40'
-    sample_monitor_xhdiv.restore_neutron = '1'
-    sample_monitor_xhdiv.radius = '0'
-    sample_monitor_xhdiv.options = '"x limits [-0.05:0.05] bins = 100, hdiv limits [-1.5:1.5] bins = 100"'
-    sample_monitor_xhdiv.filename = '"sample_monitor_xhdiv.dat"'
-    sample_monitor_xhdiv.geometry = '"NULL"'
-    sample_monitor_xhdiv.nowritefile = '0'
-    sample_monitor_xhdiv.nexus_bins = '0'
-    sample_monitor_xhdiv.username1 = '"NULL"'
-    sample_monitor_xhdiv.username2 = '"NULL"'
-    sample_monitor_xhdiv.username3 = '"NULL"'
-    
-    # Comp instance sample_monitor_ToF_BeamSize, placement and parameters
-    sample_monitor_ToF_BeamSize = instr.add_component('sample_monitor_ToF_BeamSize','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_xhdiv', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_xhdiv')
-    
-    sample_monitor_ToF_BeamSize.user1 = '""'
-    sample_monitor_ToF_BeamSize.user2 = '""'
-    sample_monitor_ToF_BeamSize.user3 = '""'
-    sample_monitor_ToF_BeamSize.xwidth = '0.01'
-    sample_monitor_ToF_BeamSize.yheight = '0.03'
-    sample_monitor_ToF_BeamSize.zdepth = '0'
-    sample_monitor_ToF_BeamSize.xmin = '0'
-    sample_monitor_ToF_BeamSize.xmax = '0'
-    sample_monitor_ToF_BeamSize.ymin = '0'
-    sample_monitor_ToF_BeamSize.ymax = '0'
-    sample_monitor_ToF_BeamSize.zmin = '0'
-    sample_monitor_ToF_BeamSize.zmax = '0'
-    sample_monitor_ToF_BeamSize.bins = '0'
-    sample_monitor_ToF_BeamSize.min = '-1e40'
-    sample_monitor_ToF_BeamSize.max = '1e40'
-    sample_monitor_ToF_BeamSize.restore_neutron = '1'
-    sample_monitor_ToF_BeamSize.radius = '0'
-    sample_monitor_ToF_BeamSize.options = 'setS'
-    sample_monitor_ToF_BeamSize.filename = '"sample_monitor_tof_BeamSize.dat"'
-    sample_monitor_ToF_BeamSize.geometry = '"NULL"'
-    sample_monitor_ToF_BeamSize.nowritefile = '0'
-    sample_monitor_ToF_BeamSize.nexus_bins = '0'
-    sample_monitor_ToF_BeamSize.username1 = '"NULL"'
-    sample_monitor_ToF_BeamSize.username2 = '"NULL"'
-    sample_monitor_ToF_BeamSize.username3 = '"NULL"'
-    
-    # Comp instance sample_monitor_ToF_cm2, placement and parameters
-    sample_monitor_ToF_cm2 = instr.add_component('sample_monitor_ToF_cm2','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_ToF_BeamSize', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_ToF_BeamSize')
-    
-    sample_monitor_ToF_cm2.user1 = '""'
-    sample_monitor_ToF_cm2.user2 = '""'
-    sample_monitor_ToF_cm2.user3 = '""'
-    sample_monitor_ToF_cm2.xwidth = '0.01'
-    sample_monitor_ToF_cm2.yheight = '0.01'
-    sample_monitor_ToF_cm2.zdepth = '0'
-    sample_monitor_ToF_cm2.xmin = '0'
-    sample_monitor_ToF_cm2.xmax = '0'
-    sample_monitor_ToF_cm2.ymin = '0'
-    sample_monitor_ToF_cm2.ymax = '0'
-    sample_monitor_ToF_cm2.zmin = '0'
-    sample_monitor_ToF_cm2.zmax = '0'
-    sample_monitor_ToF_cm2.bins = '0'
-    sample_monitor_ToF_cm2.min = '-1e40'
-    sample_monitor_ToF_cm2.max = '1e40'
-    sample_monitor_ToF_cm2.restore_neutron = '1'
-    sample_monitor_ToF_cm2.radius = '0'
-    sample_monitor_ToF_cm2.options = 'setS'
-    sample_monitor_ToF_cm2.filename = '"sample_monitor_tof_1cm2.dat"'
-    sample_monitor_ToF_cm2.geometry = '"NULL"'
-    sample_monitor_ToF_cm2.nowritefile = '0'
-    sample_monitor_ToF_cm2.nexus_bins = '0'
-    sample_monitor_ToF_cm2.username1 = '"NULL"'
-    sample_monitor_ToF_cm2.username2 = '"NULL"'
-    sample_monitor_ToF_cm2.username3 = '"NULL"'
-    
-    # Comp instance sample_monitor_ToF, placement and parameters
-    sample_monitor_ToF = instr.add_component('sample_monitor_ToF','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_ToF_cm2', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_ToF_cm2')
-    
-    sample_monitor_ToF.user1 = '""'
-    sample_monitor_ToF.user2 = '""'
-    sample_monitor_ToF.user3 = '""'
-    sample_monitor_ToF.xwidth = '0.075'
-    sample_monitor_ToF.yheight = '0.05'
-    sample_monitor_ToF.zdepth = '0'
-    sample_monitor_ToF.xmin = '0'
-    sample_monitor_ToF.xmax = '0'
-    sample_monitor_ToF.ymin = '0'
-    sample_monitor_ToF.ymax = '0'
-    sample_monitor_ToF.zmin = '0'
-    sample_monitor_ToF.zmax = '0'
-    sample_monitor_ToF.bins = '0'
-    sample_monitor_ToF.min = '-1e40'
-    sample_monitor_ToF.max = '1e40'
-    sample_monitor_ToF.restore_neutron = '1'
-    sample_monitor_ToF.radius = '0'
-    sample_monitor_ToF.options = 'setS'
-    sample_monitor_ToF.filename = '"sample_monitor_tof.dat"'
-    sample_monitor_ToF.geometry = '"NULL"'
-    sample_monitor_ToF.nowritefile = '0'
-    sample_monitor_ToF.nexus_bins = '0'
-    sample_monitor_ToF.username1 = '"NULL"'
-    sample_monitor_ToF.username2 = '"NULL"'
-    sample_monitor_ToF.username3 = '"NULL"'
-    
-    # Comp instance sample_monitor_lam, placement and parameters
-    sample_monitor_lam = instr.add_component('sample_monitor_lam','Monitor_nD', AT=['0', '0', '1E-6'], AT_RELATIVE='sample_monitor_ToF', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_ToF')
-    
-    sample_monitor_lam.user1 = '""'
-    sample_monitor_lam.user2 = '""'
-    sample_monitor_lam.user3 = '""'
-    sample_monitor_lam.xwidth = '0.055'
-    sample_monitor_lam.yheight = '0.075'
-    sample_monitor_lam.zdepth = '0'
-    sample_monitor_lam.xmin = '0'
-    sample_monitor_lam.xmax = '0'
-    sample_monitor_lam.ymin = '0'
-    sample_monitor_lam.ymax = '0'
-    sample_monitor_lam.zmin = '0'
-    sample_monitor_lam.zmax = '0'
-    sample_monitor_lam.bins = '0'
-    sample_monitor_lam.min = '-1e40'
-    sample_monitor_lam.max = '1e40'
-    sample_monitor_lam.restore_neutron = '1'
-    sample_monitor_lam.radius = '0'
-    sample_monitor_lam.options = 'setSL'
-    sample_monitor_lam.filename = '"sample_monitor_lam.dat"'
-    sample_monitor_lam.geometry = '"NULL"'
-    sample_monitor_lam.nowritefile = '0'
-    sample_monitor_lam.nexus_bins = '0'
-    sample_monitor_lam.username1 = '"NULL"'
-    sample_monitor_lam.username2 = '"NULL"'
-    sample_monitor_lam.username3 = '"NULL"'
-    
-#     # Comp instance Sample, placement and parameters
-#     Sample = instr.add_component('Sample','Incoherent', AT=['0', '0', '0.015'], AT_RELATIVE='Sample_pos', ROTATED=['0', '0', '0'], ROTATED_RELATIVE='Sample_pos')
-#     # EXTEND at Sample
-#     Sample.append_EXTEND(r'''
-#   if (!SCATTERED) ABSORB;
-#     ''')
+    # Comp instance Sample, placement and parameters
+    Sample = instr.add_component('Sample','Incoherent', AT=['0', '0', '0.015'], AT_RELATIVE='Sample_pos', ROTATED=['0', '0', '0'], ROTATED_RELATIVE='Sample_pos')
+    # SPLIT 20 times at Sample
+    Sample.set_SPLIT('20')
+    # EXTEND at Sample
+    Sample.append_EXTEND(r'''
+  if (!SCATTERED) ABSORB;
+    ''')
 
 
     
-#     Sample.geometry = '0'
-#     Sample.radius = '0'
-#     Sample.xwidth = '0.01'
-#     Sample.yheight = '0.03'
-#     Sample.zdepth = '0.01'
-#     Sample.thickness = '0'
-#     Sample.target_x = '0'
-#     Sample.target_y = '0'
-#     Sample.target_z = '0'
-#     Sample.focus_r = '0'
-#     Sample.focus_xw = '0.02'
-#     Sample.focus_yh = '0.03'
-#     Sample.focus_aw = '0'
-#     Sample.focus_ah = '0'
-#     Sample.target_index = '+ 1'
-#     Sample.pack = '1'
-#     Sample.p_interact = '1'
-#     Sample.f_QE = '0'
-#     Sample.gamma = '0'
-#     Sample.Etrans = '0'
-#     Sample.deltaE = '0'
-#     Sample.sigma_abs = '5.08'
-#     Sample.sigma_inc = '5.08'
-#     Sample.Vc = '13.827'
-#     Sample.concentric = '0'
-#     Sample.order = '0'
-
+    Sample.geometry = '0'
+    Sample.radius = '0'
+    Sample.xwidth = '0.01'
+    Sample.yheight = '0.03'
+    Sample.zdepth = '0.002'
+    Sample.thickness = '0'
+    Sample.target_x = '0'
+    Sample.target_y = '0'
+    Sample.target_z = '0'
+    Sample.focus_r = '0'
+    Sample.focus_xw = '0'
+    Sample.focus_yh = '0'
+    Sample.focus_aw = '0'
+    Sample.focus_ah = '0'
+    Sample.target_index = '+ 1'
+    Sample.pack = '1'
+    Sample.p_interact = '1'
+    Sample.f_QE = '0'
+    Sample.gamma = '0'
+    Sample.Etrans = '0'
+    Sample.deltaE = '0'
+    Sample.sigma_abs = '0'
+    Sample.sigma_inc = '100'
+    Sample.Vc = '13.827'
+    Sample.concentric = '0'
+    Sample.order = '1'
+    
+    
         # Comp instance Banana_1, placement and parameters
-    Banana_1 = instr.add_component('Banana_1','Monitor_nD', AT=['0', '0', '0.0'], AT_RELATIVE='Sample', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Sample')
+    Banana_1 = instr.add_component('Trex_banana_det','Monitor_nD', AT=['0', '0', '0'], AT_RELATIVE='Sample', ROTATED=['0', '0', '0'], ROTATED_RELATIVE='Sample')
     Banana_1.user1 = '""'
     Banana_1.user2 = '""'
     Banana_1.user3 = '""'
@@ -3696,8 +3146,8 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     Banana_1.min = '-1e40'
     Banana_1.max = '1e40'
     Banana_1.restore_neutron = '1'
-    Banana_1.radius = '3.5'
-    Banana_1.options = '"mantid banana theta bins=221 limits=[30, 140] y bins=136, neutron pixel min=0 t, list all neutrons"'
+    Banana_1.radius = '3'
+    Banana_1.options = '"mantid banana theta bins=221 limits=[5, 135] y bins=136, neutron pixel min=0 t, list all neutrons"'
     Banana_1.filename = '"direct_event_banana_signal.dat"'
     Banana_1.geometry = '"NULL"'
     Banana_1.nowritefile = '0'
@@ -3706,38 +3156,7 @@ sprintf(setSMlvdiv, "vdiv limits [-2.5:2.5] bins = 200, lambda limits=[%g %g], b
     Banana_1.username2 = '"NULL"'
     Banana_1.username3 = '"NULL"'
     
-    # Comp instance Trex_banana_det, placement and parameters
-    Trex_banana_det = instr.add_component('Trex_banana_det','Monitor_nD', AT=['0', '0', '3'], AT_RELATIVE='Sample', ROTATED=['0', '0', '0'], ROTATED_RELATIVE='Sample')
-    
-    Trex_banana_det.user1 = '""'
-    Trex_banana_det.user2 = '""'
-    Trex_banana_det.user3 = '""'
-    Trex_banana_det.xwidth = '0.055'
-    Trex_banana_det.yheight = '0.075'
-    Trex_banana_det.zdepth = '0'
-    Trex_banana_det.xmin = '0'
-    Trex_banana_det.xmax = '0'
-    Trex_banana_det.ymin = '0'
-    Trex_banana_det.ymax = '0'
-    Trex_banana_det.zmin = '0'
-    Trex_banana_det.zmax = '0'
-    Trex_banana_det.bins = '0'
-    Trex_banana_det.min = '-1e40'
-    Trex_banana_det.max = '1e40'
-    Trex_banana_det.restore_neutron = '1'
-    Trex_banana_det.radius = '0'
-    Trex_banana_det.options = 'square_options'
-    Trex_banana_det.filename = '"Trex_banana_tof_monitor.dat"'
-    Trex_banana_det.geometry = '"NULL"'
-    Trex_banana_det.nowritefile = '0'
-    Trex_banana_det.nexus_bins = '0'
-    Trex_banana_det.username1 = '"NULL"'
-    Trex_banana_det.username2 = '"NULL"'
-    Trex_banana_det.username3 = '"NULL"'
 
-
-    
-    
     # Instruct McStasscript not to 'check everythng'
     instr.settings(checks=False)
     return instr
@@ -3792,4 +3211,4 @@ if __name__ == '__main__':
     #data = sim_widget.get_data()
 
 
-# end of generated Python code TREX_McStas_generated.py 
+# end of generated Python code TREX_generated.py 

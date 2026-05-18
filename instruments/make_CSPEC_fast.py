@@ -4072,7 +4072,7 @@ def make(name="CSPEC_generated", input_path=None):
     M0.theta_0 = 'theta_M'
     M0.radius = '0.35'
     M0.yheight = '0.04900'
-    M0.nu = 'Freq_M/2'
+    M0.nu = 'Freq_M/4'
     M0.nslit = '1'
     M0.jitter = '0'
     M0.delay = 'M1_Delay'
@@ -4257,7 +4257,7 @@ def make(name="CSPEC_generated", input_path=None):
     PSD_Out.ymax = '0.03'
     PSD_Out.xwidth = '0'
     PSD_Out.yheight = '0'
-    PSD_Out.restore_neutron = '0'
+    PSD_Out.restore_neutron = '1'
     PSD_Out.nowritefile = '0'
     
     # Comp instance Lambda_Sample, placement and parameters
@@ -4288,7 +4288,7 @@ def make(name="CSPEC_generated", input_path=None):
     PSD_Out_small.ymax = '0.005'
     PSD_Out_small.xwidth = '0'
     PSD_Out_small.yheight = '0'
-    PSD_Out_small.restore_neutron = '0'
+    PSD_Out_small.restore_neutron = '1'
     PSD_Out_small.nowritefile = '0'
     
     # Comp instance PSD_Out_bck, placement and parameters
@@ -4303,7 +4303,7 @@ def make(name="CSPEC_generated", input_path=None):
     PSD_Out_bck.ymax = '0.01'
     PSD_Out_bck.xwidth = '0'
     PSD_Out_bck.yheight = '0'
-    PSD_Out_bck.restore_neutron = '0'
+    PSD_Out_bck.restore_neutron = '1'
     PSD_Out_bck.nowritefile = '0'
     
     # Comp instance Div_Mon_Sample, placement and parameters
@@ -4344,7 +4344,7 @@ def make(name="CSPEC_generated", input_path=None):
     Hdiv_lambda_end.bins = '0'
     Hdiv_lambda_end.min = '-1e40'
     Hdiv_lambda_end.max = '1e40'
-    Hdiv_lambda_end.restore_neutron = '0'
+    Hdiv_lambda_end.restore_neutron = '1'
     Hdiv_lambda_end.radius = '0'
     Hdiv_lambda_end.options = '"lambda bins=19 limits=[2 20]; hdiv bins=80 limits[-4.0 4.0]"'
     Hdiv_lambda_end.filename = '"Hdivx_lambda_end.dat"'
@@ -4374,7 +4374,7 @@ def make(name="CSPEC_generated", input_path=None):
     Vdiv_lambda_end.bins = '0'
     Vdiv_lambda_end.min = '-1e40'
     Vdiv_lambda_end.max = '1e40'
-    Vdiv_lambda_end.restore_neutron = '0'
+    Vdiv_lambda_end.restore_neutron = '1'
     Vdiv_lambda_end.radius = '0'
     Vdiv_lambda_end.options = '" lambda bins=19 limits=[2 20] ; vdiv bins=80 limits[-4.0 4.0] "'
     Vdiv_lambda_end.filename = '"Vdivy_lambda_end.dat"'
@@ -4404,7 +4404,7 @@ def make(name="CSPEC_generated", input_path=None):
     HPSD_lambda_end.bins = '0'
     HPSD_lambda_end.min = '-1e40'
     HPSD_lambda_end.max = '1e40'
-    HPSD_lambda_end.restore_neutron = '0'
+    HPSD_lambda_end.restore_neutron = '1'
     HPSD_lambda_end.radius = '0'
     HPSD_lambda_end.options = '" lambda bins=19 limits=[2 20] ; y bins=80 limits[-4.0 4.0] "'
     HPSD_lambda_end.filename = '"height_lambda_end.dat"'
@@ -4434,7 +4434,7 @@ def make(name="CSPEC_generated", input_path=None):
     WPSD_lambda_end.bins = '0'
     WPSD_lambda_end.min = '-1e40'
     WPSD_lambda_end.max = '1e40'
-    WPSD_lambda_end.restore_neutron = '0'
+    WPSD_lambda_end.restore_neutron = '1'
     WPSD_lambda_end.radius = '0'
     WPSD_lambda_end.options = '" lambda bins=19 limits=[2 20] ; x bins=80 limits[-4.0 4.0] "'
     WPSD_lambda_end.filename = '"width_lambda_end.dat"'
@@ -4497,7 +4497,7 @@ def make(name="CSPEC_generated", input_path=None):
     tof.bins = '0'
     tof.min = '-1e40'
     tof.max = '1e40'
-    tof.restore_neutron = '0'
+    tof.restore_neutron = '1'
     tof.radius = '0'
     tof.options = '"t bins 500 limits [0, 0.4]"'
     tof.filename = '"time.dat"'
@@ -4546,7 +4546,7 @@ def make(name="CSPEC_generated", input_path=None):
 
     # Added sample monitor lambda / tof 
         # Comp instance sample_monitor_lam, placement and parameters
-    sample_monitor_lam = instr.add_component('Cheat_lambda_tof_monitor','Monitor_nD', AT=['0', '0', '0'], AT_RELATIVE='TOF_Sample_AllLambda_zoom', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_ToF')
+    sample_monitor_lam = instr.add_component('Cheat_lambda_tof_monitor','Monitor_nD', AT=['0', '0', '-0.07'], AT_RELATIVE='TOF_Sample_AllLambda_zoom', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_ToF')
 
     sample_monitor_lam.user1 = '""'
     sample_monitor_lam.user2 = '""'
@@ -4565,6 +4565,7 @@ def make(name="CSPEC_generated", input_path=None):
     sample_monitor_lam.max = '1e40'
     sample_monitor_lam.restore_neutron = '1'
     sample_monitor_lam.radius = '0'
+    sample_monitor_lam.tsplit='1'
     # sample_monitor_lam.options = '"lambda bins = 221 limits [lambda_min -1.2: lambda_min + 1.2] ' \
     # 't bins = 221 limits  [252.78 * ( lambda_min -1.5 ) * ( 160.0514 ): 252.78 * ( lambda_min +1.5 ) * ( 160.0514 )]"'
     instr.add_declare_var("char", "options_string", array=512)
@@ -4649,7 +4650,7 @@ def make(name="CSPEC_generated", input_path=None):
     det_NDmonitor.bins = '0'
     det_NDmonitor.min = '-1e40'
     det_NDmonitor.max = '1e40'
-    det_NDmonitor.restore_neutron = '0'
+    det_NDmonitor.restore_neutron = '1'
     det_NDmonitor.radius = '0'
     det_NDmonitor.options = '"x bins=100 ybins=100"'
     #det_NDmonitor.options = '"mantid banana theta bins=221 limits=[-40, 140] y bins=136, neutron pixel min=0 t, list all neutrons"'
@@ -4681,6 +4682,7 @@ def make(name="CSPEC_generated", input_path=None):
     Banana_1.max = '1e40'
     Banana_1.restore_neutron = '1'
     Banana_1.radius = '3.5'
+    Banana_1.tsplit = '1'
     Banana_1.options = '"mantid banana theta bins=221 limits=[-40, 140] y bins=136, neutron pixel min=0 t, list all neutrons"'
     Banana_1.filename = '"direct_event_banana_signal.dat"'
     Banana_1.geometry = '"NULL"'
