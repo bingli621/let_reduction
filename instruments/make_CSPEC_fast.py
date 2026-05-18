@@ -63,7 +63,8 @@ def make(name="CSPEC_generated", input_path=None):
     Freq_BW1 = instr.add_parameter('double', 'Freq_BW1', value=14.0, comment='Parameter type (double) added by McCode py-generator')
     Freq_BW2 = instr.add_parameter('double', 'Freq_BW2', value=14.0, comment='Parameter type (double) added by McCode py-generator')
     Freq_BW3 = instr.add_parameter('double', 'Freq_BW3', value=14.0, comment='Parameter type (double) added by McCode py-generator')
-    Freq_M = instr.add_parameter('double', 'Freq_M', value=168.0, comment='Parameter type (double) added by McCode py-generator')
+    # max resolution for chopper 168*2
+    Freq_M = instr.add_parameter('double', 'Freq_M', value=336, comment='Parameter type (double) added by McCode py-generator')
     Distance_BW1 = instr.add_parameter('double', 'Distance_BW1', value=13.7236, comment='Parameter type (double) added by McCode py-generator')
     Distance_BW2 = instr.add_parameter('double', 'Distance_BW2', value=20.4766, comment='Parameter type (double) added by McCode py-generator')
     Distance_BW3 = instr.add_parameter('double', 'Distance_BW3', value=104.52, comment='Parameter type (double) added by McCode py-generator')
@@ -4065,6 +4066,23 @@ def make(name="CSPEC_generated", input_path=None):
     Arm87_WindowPreMChopper = instr.add_component('Arm87_WindowPreMChopper','Arm', AT=['0', '0', '0.51 + 1e-6'], AT_RELATIVE='Guide_w03_09_01', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Guide_w03_09_01')
     
     
+    # Added M0 chopper!
+    M0 = instr.add_component('M0','DiskChopper', AT=['0', '0', '0.019'], AT_RELATIVE='Arm87_WindowPreMChopper', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Arm87_WindowPreMChopper')
+    
+    M0.theta_0 = 'theta_M'
+    M0.radius = '0.35'
+    M0.yheight = '0.04900'
+    M0.nu = 'Freq_M/2'
+    M0.nslit = '1'
+    M0.jitter = '0'
+    M0.delay = 'M1_Delay'
+    M0.isfirst = '0'
+    M0.n_pulse = '1'
+    M0.abs_out = '1'
+    M0.phase = '0'
+    M0.xwidth = '0'
+    M0.verbose = '1'
+
     # Comp instance M1, placement and parameters
     M1 = instr.add_component('M1','DiskChopper', AT=['0', '0', '0.02'], AT_RELATIVE='Arm87_WindowPreMChopper', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Arm87_WindowPreMChopper')
     
@@ -4226,8 +4244,7 @@ def make(name="CSPEC_generated", input_path=None):
     
     # Comp instance Arm_Sample, placement and parameters
     Arm_Sample = instr.add_component('Arm_Sample','Arm', AT=['0', '0', '0.2'], AT_RELATIVE='EndOfGuide', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='EndOfGuide')
-    
-    
+
     # Comp instance PSD_Out, placement and parameters
     PSD_Out = instr.add_component('PSD_Out','PSD_monitor', AT=['0', '0', '1e-06'], AT_RELATIVE='Arm_Sample', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='Arm_Sample')
     
@@ -4525,7 +4542,48 @@ def make(name="CSPEC_generated", input_path=None):
     TOF_Sample_AllLambda_zoom.dt = '1.0'
     TOF_Sample_AllLambda_zoom.restore_neutron = '1'
     TOF_Sample_AllLambda_zoom.nowritefile = '0'
-    
+
+
+    # Added sample monitor lambda / tof 
+        # Comp instance sample_monitor_lam, placement and parameters
+    sample_monitor_lam = instr.add_component('Cheat_lambda_tof_monitor','Monitor_nD', AT=['0', '0', '0'], AT_RELATIVE='TOF_Sample_AllLambda_zoom', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='sample_monitor_ToF')
+
+    sample_monitor_lam.user1 = '""'
+    sample_monitor_lam.user2 = '""'
+    sample_monitor_lam.user3 = '""'
+    sample_monitor_lam.xwidth = '0.055'
+    sample_monitor_lam.yheight = '0.075'
+    sample_monitor_lam.zdepth = '0'
+    sample_monitor_lam.xmin = '0'
+    sample_monitor_lam.xmax = '0'
+    sample_monitor_lam.ymin = '0'
+    sample_monitor_lam.ymax = '0'
+    sample_monitor_lam.zmin = '0'
+    sample_monitor_lam.zmax = '0'
+    sample_monitor_lam.bins = '0'
+    sample_monitor_lam.min = '-1e40'
+    sample_monitor_lam.max = '1e40'
+    sample_monitor_lam.restore_neutron = '1'
+    sample_monitor_lam.radius = '0'
+    # sample_monitor_lam.options = '"lambda bins = 221 limits [lambda_min -1.2: lambda_min + 1.2] ' \
+    # 't bins = 221 limits  [252.78 * ( lambda_min -1.5 ) * ( 160.0514 ): 252.78 * ( lambda_min +1.5 ) * ( 160.0514 )]"'
+    instr.add_declare_var("char", "options_string", array=512)
+    instr.append_initialize('''
+    snprintf(options_string, sizeof(options_string), "lambda bins = 501 limits [%lf : %lf], t bins=501 limits [ %lf : %lf]", lambda_min -1.2, lambda_min + 1.2, (252.78 * ( lambda_min -1.5 ) * ( 160.0514 )) / 1000000, (252.78 * ( lambda_min +1.5 ) * ( 160.0514 ))/1000000);
+    ''')
+    sample_monitor_lam.options = "options_string"
+    # sample_monitor_lam.options = '"lambda bins = 501 limits [4.8 : 5.4], t bins=501 limits [0.27 : 0.29]"'
+    sample_monitor_lam.filename = '"sample_monitor_lam.dat"'
+    sample_monitor_lam.geometry = '"NULL"'
+    sample_monitor_lam.nowritefile = '0'
+    sample_monitor_lam.nexus_bins = '0'
+    sample_monitor_lam.username1 = '"NULL"'
+    sample_monitor_lam.username2 = '"NULL"'
+    sample_monitor_lam.username3 = '"NULL"'
+
+
+
+
     # Comp instance Sample, placement and parameters
     # Sample = instr.add_component('Sample','Incoherent', AT=['0', '0', '0.00000001'], AT_RELATIVE='TOF_Sample_AllLambda_zoom', ROTATED=['0.0', '0.0', '0.0'], ROTATED_RELATIVE='TOF_Sample_AllLambda_zoom')
     
@@ -4623,7 +4681,7 @@ def make(name="CSPEC_generated", input_path=None):
     Banana_1.max = '1e40'
     Banana_1.restore_neutron = '1'
     Banana_1.radius = '3.5'
-    Banana_1.options = '"mantid banana theta bins=221 limits=[30, 140] y bins=136, neutron pixel min=0 t, list all neutrons"'
+    Banana_1.options = '"mantid banana theta bins=221 limits=[-40, 140] y bins=136, neutron pixel min=0 t, list all neutrons"'
     Banana_1.filename = '"direct_event_banana_signal.dat"'
     Banana_1.geometry = '"NULL"'
     Banana_1.nowritefile = '0'

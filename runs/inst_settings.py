@@ -17,7 +17,7 @@ let_kwargs = {
 
 
 cspec_kwargs = {
-    "AT":['0', '0', '0.00000001'],
+    "AT":['0', '0', '1E-5'],
     "AT_RELATIVE":'TOF_Sample_AllLambda_zoom',
     "ROTATED":['0.0', '0.0', '0.0'],
     "ROTATED_RELATIVE":'TOF_Sample_AllLambda_zoom',
